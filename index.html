@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>To-Do App</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: rgb(7, 7, 7);
+    }
+    
+    .container {
+      max-width: 400px;
+      margin: 100px auto;
+    }
+    
+    h1 {
+      text-align: center;
+      color: white;
+    }
+    
+    .task-input {
+      display: flex;
+      margin-bottom: 10px;
+    }
+    
+    .task-input input[type="text"] {
+      flex-grow: 1;
+      padding: 5px;
+    }
+    
+    .task-input button {
+      margin-left: 5px;
+      padding: 5px 10px;
+    }
+    
+    ul {
+      list-style-type: none;
+      padding: 12px;
+    }
+    ul li {
+      color: white;
+      margin: 12px;
+    }
+    
+    .task {
+      display: flex;
+      align-items: center;
+      margin-bottom: 5px;
+    }
+    
+    .task input[type="checkbox"] {
+      margin-right: 5px;
+     
+    }
+    
+    .completed-task {
+      text-decoration: line-through;
+      color: #888;
+    }
+    
+    .delete-button {
+      margin-left: 5px;
+      background-color: #f44336;
+      color: #fff;
+      border: none;
+      float: right;
+      padding: 5px 10px;
+      cursor: pointer;
+      border-radius: 10px;
+    }
+
+    .edit-button {
+      margin-left: 5px;
+      background-color: #4CAF50;
+      color: #fff;
+      border: none;
+      padding: 5px 10px;
+      cursor: pointer;
+      float: right;
+      border-radius: 10px;
+    }
+    #addTaskButton{
+      width: 70px;
+      border-radius: 10px;
+      background-color: rgb(123, 123, 248);
+      color: #fff;
+    }
+    #addTaskButton:hover{
+      background-color: rgb(94, 94, 238);
+      cursor: pointer;
+
+    }
+    .timestamp {
+      font-size: 12px;
+      color: #888;
+      margin-left: 5px;
+    }
+   
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>To-Do App</h1>
+    <div class="task-input">
+      <input type="text" id="newTaskInput" placeholder="Enter a new task">
+      <button id="addTaskButton">Add</button>
+    </div>
+    <div>
+      <h3 style="color: #f44336;">Pending Tasks</h3>
+      <ul id="pendingTasksList"></ul>
+    </div>
+    <div>
+      <h3 style="color: #4CAF50;">Completed Tasks</h3>
+      <ul id="completedTasksList"></ul>
+    </div>
+  </div>
+
+  <script>
+    // Store tasks in an array
+    let tasks = [];
+
+    // Get DOM elements
+    const newTaskInput = document.getElementById('newTaskInput');
+    const addTaskButton = document.getElementById('addTaskButton');
+    const pendingTasksList = document.getElementById('pendingTasksList');
+    const completedTasksList = document.getElementById('completedTasksList');
+
+    // Add event listener to add task button
+    addTaskButton.addEventListener('click', addTask);
+
+    // Function to add a new task
+    function addTask() {
+      const taskName = newTaskInput.value.trim();
+      if (taskName !== '') {
+        const newTask = {
+          name: taskName,
+          completed: false,
+          timestamp: new Date()
+        };
+        tasks.push(newTask);
+        renderTasks();
+        newTaskInput.value = '';
+      }
+    }
+
+    // Function to render tasks in the DOM
+    function renderTasks() {
+      pendingTasksList.innerHTML = '';
+      completedTasksList.innerHTML = '';
+
+      tasks.forEach((task, index) => {
+        const taskElement = document.createElement('li');
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.checked = task.completed;
+        checkbox.addEventListener('change', () => toggleTaskCompletion(index));
+
+        const taskNameElement = document.createElement('span');
+        taskNameElement.textContent = task.name;
+        taskNameElement.className = task.completed ? 'completed-task' : '';
+
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = 'Delete';
+        deleteButton.className = 'delete-button';
+        deleteButton.addEventListener('click', () => deleteTask(index));
+
+        const editButton = document.createElement('button');
+        editButton.textContent = 'Edit';
+        editButton.className = 'edit-button';
+        editButton.addEventListener('click', () => editTask(index));
+
+        const timestampElement = document.createElement('span');
+        timestampElement.textContent = formatDate(task.timestamp);
+        timestampElement.className = 'timestamp';
+
+        taskElement.appendChild(checkbox);
+        taskElement.appendChild(taskNameElement);
+        taskElement.appendChild(timestampElement);
+        taskElement.appendChild(editButton);
+        taskElement.appendChild(deleteButton);
+
+        if (task.completed) {
+          completedTasksList.appendChild(taskElement);
+        } else {
+          pendingTasksList.appendChild(taskElement);
+        }
+      });
+    }
+
+    // Function to toggle task completion
+    function toggleTaskCompletion(index) {
+      tasks[index].completed = !tasks[index].completed;
+      renderTasks();
+    }
+
+    // Function to delete a task
+    function deleteTask(index){
+      tasks.splice(index, 1);
+      renderTasks();
+    }
+
+    // Function to edit a task
+    function editTask(index) {
+      const newTaskName = prompt('Enter the updated task name:');
+   
+      if (newTaskName !== null) {
+        tasks[index].name = newTaskName.trim();
+        renderTasks();
+      }
+    }
+
+    // Function to format the date and time
+    function formatDate(date) {
+      const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' };
+      return date.toLocaleDateString('en-US', options);
+    }
+  </script>
+</body>
+</html>
